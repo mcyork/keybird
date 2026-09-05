@@ -145,6 +145,19 @@ def deploy_to_pi(pi_name):
     # Step 4: Install system packages (pip3 and python3-evdev)
     print("📦 Installing system packages...")
     print("   This may take a minute on first install...")
+
+    # Refresh the apt index first. A stale index points at package versions the
+    # mirror no longer has, so the install below fails with 404 "Failed to fetch"
+    # errors. This error condition is eaten and invisible without this change.
+    # Run update on its own so a failure here is visible, not masked.
+    print("   Refreshing package index (apt-get update)...")
+    update_result = subprocess.run(
+        [pi_name, 'run-stream', 'sudo apt-get update'],
+        text=True
+    )
+    if update_result.returncode != 0:
+        print("⚠️  Warning: apt-get update failed - the package install may 404")
+
     result = subprocess.run(
         [pi_name, 'run-stream', 'sudo apt-get install -y python3-pip python3-flask python3-evdev 2>&1 | tail -10'],
         text=True
