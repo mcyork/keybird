@@ -148,7 +148,8 @@ def deploy_to_pi(pi_name):
 
     # Refresh the apt index first. A stale index points at package versions the
     # mirror no longer has, so the install below fails with 404 "Failed to fetch"
-    # errors. Run update on its own so a failure here is visible, not masked.
+    # errors. This error condition is eaten by the current code.
+    # Run update on its own so a failure here is visible, not masked.
     print("   Refreshing package index (apt-get update)...")
     update_result = subprocess.run(
         [pi_name, 'run-stream', 'sudo apt-get update'],
